@@ -1,5 +1,7 @@
 # Jump to the loader
 
+[本节源代码]()
+
 上一节，我们在 FAT12 文件系统中找到了 loader.bin 的记录。这一节，我们根据这条记录，把 loader.bin 从磁盘加载到内存，并把计算机的控制权交给它。
 
 首先，在根目录区域找到 loader.bin 的根目录项之后，我们从它的 0x1A 偏移处，读出 FAT 索引：
@@ -48,7 +50,6 @@ _continue_loading_loader:
 ```
 
 第四，根据第一个读到的 FAT 记录，假设有一个读取下一条 FAT 记录的函数 `get_fat_entry`。我们比较一下调用它之后的返回值，如果是 0xFFF，就表示这已经是文件的最后一个数据扇区了，loader.bin 已经加载完毕：
-
 
 ```asm
 pop ax; AX = cluster number
@@ -170,7 +171,12 @@ pb 0x10000
 
 ## 整理项目目录
 
+这一节最后，我们整理下项目目录。为了能够自动化编译和写入 boot.img 的过程。我们在项目根目录创建了两个脚本：
 
+* [build.sh](https://github.com/puretears/yuna/blob/master/build.sh)：用于编译项目文件，并启动 docker，每次我们只要在终端执行这个脚本就好了；
+* [cp.sh](https://github.com/puretears/yuna/blob/master/cp.sh)：这是在容器内执行的脚本，用于挂载磁盘镜像以及拷贝文件；
+
+至于构建过程中生成的所有文件，我们都统一放到 Output 目录里。至于这两个脚本的内容，都是之前我们在终端手工执行的命令，大家自己去看看源代码就好，这里就不解释了。
 
 ## What's next
 

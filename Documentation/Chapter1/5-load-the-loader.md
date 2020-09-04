@@ -1,5 +1,7 @@
 # Load the loader
 
+[本节源代码](https://github.com/puretears/yuna/tree/master/Documentation/Chapter1/Execise05)
+
 有了前面的一番准备工作，这一节，我们终于可以开始写代码在软盘镜像中加载程序了。
 
 ## 一些有用的常量和变量
@@ -266,7 +268,7 @@ _loader_found:
 
 ![load-the-loader-2](Images/load-the-loader-2@2x.jpg)
 
-[这里]()有一份完整的分析结果，大家可以点过去看下，或者自己在电脑上生成一份。这份结果可以帮助我们更好地对汇编代码进行局部分析，找到其中的问题。
+[这里](https://github.com/puretears/yuna/blob/master/Output/ascii_graph.txt)有一份完整的分析结果，大家可以点过去看下，或者自己在电脑上生成一份。这份结果可以帮助我们更好地对汇编代码进行局部分析，找到其中的问题。
 
 > 当函数比较复杂之后，可能生成的文本图形就不太便于分析了。这时，我们可以执行 `agfd @ 0x3e > graph.dot`，生成一份 dot 文件。然后，用一个 Graphviz 工具或[在线服务](http://www.webgraphviz.com/)打开分析就好了。
 

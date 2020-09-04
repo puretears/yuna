@@ -127,4 +127,4 @@ dw 0xAA55
 
 ## What's next
 
-至此，我们的第一个内核版的 Hello, World 就完成了，完整的代码[在这里]()。下一节，我们来看如何通过 Bochs 调试和执行这段代码。
+至此，我们的第一个内核版的 Hello, World 就完成了，完整的代码[在这里](https://github.com/puretears/yuna/blob/master/Documentation/Chapter1/Execise01/boot.asm)。下一节，我们来看如何通过 Bochs 调试和执行这段代码。
