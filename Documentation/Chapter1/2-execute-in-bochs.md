@@ -169,7 +169,7 @@ Next at t=4575307
 
 通过反汇编的结果，不难发现，这部分正是 boot.asm 文件中开始的几条 CPU 指令，这证明，我们的代码已经开始被 CPU 执行了。接下来，在调试器中输入 `c`，让虚拟 CPU 恢复执行，我们就可以在刚才那个复古的 GUI 中，看到期望的结果了：
 
-![Hello, Kernel World!](https://image.boxueio.com/execute-in-bochs-1@2x.jpg)
+![Hello, Kernel World!](Images/execute-in-bochs-1@2x.jpg)
 
 这时，按照设计，CPU 就会挂起在我们编写的 `jmp` 指令上，用不了多久，你的电脑风扇就会开始狂转 :) 这时，我们可以调试器中按 `Ctrl + C` 中断执行，然后执行 `exit` 命令关闭 Bochs 就好了。
 
