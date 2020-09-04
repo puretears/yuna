@@ -1,0 +1,8 @@
+*.bin
+*.img
+bochsout.txt
+debugger.out
+*.dot
+.DS_Store
+*.monopic
+*.sketch
