@@ -1,6 +1,6 @@
 # Jump to the loader
 
-[本节源代码]()
+[本节源代码](https://github.com/puretears/yuna/tree/master/Documentation/Chapter1/Execise06)
 
 上一节，我们在 FAT12 文件系统中找到了 loader.bin 的记录。这一节，我们根据这条记录，把 loader.bin 从磁盘加载到内存，并把计算机的控制权交给它。
 
