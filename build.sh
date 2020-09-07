@@ -12,6 +12,9 @@ nasm boot.asm -o Output/boot.bin
 echo "Compiling loader.asm ..."
 nasm loader.asm -o Output/loader.bin
 
+echo "Compiling kernel.asm ..."
+nasm kernel.asm -o Output/kernel.bin
+
 echo "Dumping boot sector ..."
 dd if=Output/boot.bin of=$IMAGE bs=512 count=1 conv=notrunc
 
