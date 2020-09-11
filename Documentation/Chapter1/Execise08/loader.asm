@@ -5,7 +5,6 @@ KERNEL_BASE equ 0x0
 KERNEL_OFFSET equ 0x100000
 TMP_KERNEL_BASE equ 0x0
 TMP_KERNEL_OFFSET equ 0x7E00
-MEMORY_INFO_BUFFER equ 0x7E00
 
 %include "fat12.inc"
 
@@ -236,65 +235,6 @@ _finish_loading_kernel:
     mov bp, finish_loading_kernel_prompt
     int 10H
 
-    ; Kill motor
-    push dx
-    mov dx, 03F2H
-    mov al, 0
-    out dx, al
-    pop dx
-
-    ; ------------------ Get memory info ---------------------
-    mov ax, 1301H
-    mov bx, 000FH
-    mov dx, 0400H ; ROW 4
-    mov cx, 23
-    push ax
-    mov ax, ds
-    mov es, ax
-    pop ax
-    mov bp, memory_info_prompt
-    int 10H
-
-    mov ebx, 0
-    mov ax, 0
-    mov es, ax
-    mov di, MEMORY_INFO_BUFFER
-
-_load_mem_info:
-    mov eax, 0E820H
-    mov ecx, 20
-    mov edx, 534D4150H
-    int 15H
-    jc _load_mem_info_failed
-    add di, 20
-    cmp ebx, 0
-    jne _load_mem_info
-    jmp _load_mem_info_successed
-
-_load_mem_info_failed:
-    mov ax, 1301H
-    mov bx, 008CH
-    mov dx, 0500H
-    mov cx, 24
-    push ax
-    mov ax, ds
-    mov es, ax
-    pop ax
-    mov bp, load_mem_info_failed_message
-    int 10H
-    jmp $
-
-_load_mem_info_successed:
-    mov ax, 1301H
-    mov bx, 000FH
-    mov dx, 0500H
-    mov cx, 27
-    push ax
-    mov ax, ds
-    mov es, ax
-    pop ax
-    mov bp, load_mem_info_successed_message
-    int 10H
     jmp $
 
 [SECTION .s16lib]
@@ -310,7 +250,3 @@ kernel_name             db 'KERNEL  BIN', 0
 kernel_not_found_prompt db 'FatalError: Kernel cannot be found!'
 kernel_found_prompt     db 'Kernel has been found '
 finish_loading_kernel_prompt db 'Finish loading kernel :)'
-
-memory_info_prompt db '====== Memory Info ======'
-load_mem_info_failed_message db 'Load memory info failed.'
-load_mem_info_successed_message db 'Load memory info successed.'

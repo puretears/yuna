@@ -5,12 +5,14 @@
 
 [SECTION gdt]
 label_gdt: dd 0, 0
+code32_desc: dd 0x0000FFFF, 0x00CF9A00
 data32_desc: dd 0x0000FFFF, 0x00CF9200
 
 gdt_len equ $ - label_gdt
 gdt_ptr dw gdt_len - 1
         dd label_gdt
 
+code32_sel equ code32_desc - label_gdt
 data32_sel equ data32_desc - label_gdt
 
 [SECTION .s16]
