@@ -33,12 +33,15 @@ label_start:
     mov sp, 0x7C00 ; The bool sector isn't needed any more
 
     ; ------------------ Start loader ... ---------------------
-    mov ax, 1301H
-    mov bx, 000FH
-    mov dx, 0100H
-    mov cx, 12
-    mov bp, start_loader_message
-    int 10H
+    mov ax, start_loader_message
+    call disp_string
+    call new_line
+    ; mov ax, 1301H
+    ; mov bx, 000FH
+    ; mov dx, 0100H
+    ; mov cx, 12
+    ; mov bp, start_loader_message
+    ; int 10H
 
     ; ------------------ Open A20 address ---------------------
     push ax
@@ -125,30 +128,36 @@ _go_to_next_sector_of_root_directory:
     jmp _search_in_root_directory
 
 _kernel_not_found:
-    mov ax, 1301H
-    mov bx, 008CH
-    mov dx, 0200H
-    mov cx, 35
-    push ax
-    mov ax, ds
-    mov es, ax
-    pop ax
-    mov bp, kernel_not_found_prompt
-    int 10H
+    mov ax, kernel_not_found_prompt
+    call disp_string
+    call new_line
+    ; mov ax, 1301H
+    ; mov bx, 008CH
+    ; mov dx, 0200H
+    ; mov cx, 35
+    ; push ax
+    ; mov ax, ds
+    ; mov es, ax
+    ; pop ax
+    ; mov bp, kernel_not_found_prompt
+    ; int 10H
     jmp $ ; Hang the system
 
 _kernel_found:
     push es
-    mov ax, 1301H
-    mov bx, 000FH
-    mov dx, 0200H
-    mov cx, 22
-    push ax
-    mov ax, ds
-    mov es, ax
-    pop ax
-    mov bp, kernel_found_prompt
-    int 10H
+    mov ax, kernel_found_prompt
+    call disp_string
+    call new_line
+    ; mov ax, 1301H
+    ; mov bx, 000FH
+    ; mov dx, 0200H
+    ; mov cx, 22
+    ; push ax
+    ; mov ax, ds
+    ; mov es, ax
+    ; pop ax
+    ; mov bp, kernel_found_prompt
+    ; int 10H
     pop es
 
     mov ax, ROOT_DIR_SECTORS
@@ -189,8 +198,6 @@ _continue_loading_kernel:
     push edi
     
     mov cx, 200H
-    mov ax, KERNEL_BASE
-    mov fs, ax
     mov edi, dword [current_kernel_offset]
 
     mov ax, TMP_KERNEL_BASE
@@ -225,16 +232,19 @@ _move_kernel:
     jmp _continue_loading_kernel
 
 _finish_loading_kernel:
-    mov ax, 1301H
-    mov bx, 000FH
-    mov dx, 0300H
-    mov cx, 24
-    push ax
-    mov ax, ds
-    mov es, ax
-    pop ax
-    mov bp, finish_loading_kernel_prompt
-    int 10H
+    mov ax, finish_loading_kernel_prompt
+    call disp_string
+    call new_line
+    ; mov ax, 1301H
+    ; mov bx, 000FH
+    ; mov dx, 0300H
+    ; mov cx, 24
+    ; push ax
+    ; mov ax, ds
+    ; mov es, ax
+    ; pop ax
+    ; mov bp, finish_loading_kernel_prompt
+    ; int 10H
 
     ; Kill motor
     push dx
@@ -244,16 +254,9 @@ _finish_loading_kernel:
     pop dx
 
     ; ------------------ Get memory info ---------------------
-    mov ax, 1301H
-    mov bx, 000FH
-    mov dx, 0400H ; ROW 4
-    mov cx, 23
-    push ax
-    mov ax, ds
-    mov es, ax
-    pop ax
-    mov bp, memory_info_prompt
-    int 10H
+    mov ax, memory_info_prompt
+    call disp_string
+    call new_line
 
     mov ebx, 0
     mov ax, 0
@@ -272,45 +275,168 @@ _load_mem_info:
     jmp _load_mem_info_successed
 
 _load_mem_info_failed:
-    mov ax, 1301H
-    mov bx, 008CH
-    mov dx, 0500H
-    mov cx, 24
-    push ax
-    mov ax, ds
-    mov es, ax
-    pop ax
-    mov bp, load_mem_info_failed_message
-    int 10H
+    mov ax, load_mem_info_failed_message
+    call disp_string
+    call new_line
     jmp $
 
 _load_mem_info_successed:
-    mov ax, 1301H
-    mov bx, 000FH
-    mov dx, 0500H
-    mov cx, 27
-    push ax
-    mov ax, ds
-    mov es, ax
-    pop ax
-    mov bp, load_mem_info_successed_message
+    mov ax, load_mem_info_successed_message
+    call disp_string
+    call new_line
     int 10H
+
+    ; Get SVGA info
+    mov ax, vbe_info_prompt
+    call disp_string
+    call new_line
+
+    ; Write VBE controller info into es:di
+    xor ax, ax
+    mov es, ax
+    mov di, 8000H
+    mov ax, 4F00H
+    int 10H
+
+    cmp ax, 004FH
+    jz _get_svga_vbe_info_successed
+
+    mov ax, get_svga_vbe_info_failed
+    call disp_string
+    call new_line
+    jmp $
+
+_get_svga_vbe_info_successed:
+    mov ax, get_svga_vbe_info_successed
+    call disp_string
+    call new_line
+
+    ; Get SVGA mode info
+    mov ax, svga_mode_prompt
+    call disp_string
+    call new_line
+
+    xor ax, ax
+    mov es, ax
+    mov si, 800EH
+    mov esi, dword [es:si]
+    mov edi, 8200H
+
+_vga_mode_list:
+    mov cx, word [es:esi]
+
+    push ax
+    xor ax, ax
+    mov al, ch
+    call disp_al
+
+    xor ax, ax
+    mov al, cl
+    call disp_al
+
+    xor ax, ax
+    mov al, ' '
+    call disp_ascii
+    pop ax
+
+    cmp cx, 0FFFFH
+    jz _finish_loading_svga_mode
+
+    mov ax, 4F01H
+    int 10h
+    cmp ax, 004FH
+    jnz _load_svga_mode_failed
+
+    add esi, 2
+    add edi, 0x100
+    jmp _vga_mode_list
+
+_load_svga_mode_failed:
+    mov ax, load_svga_mode_failed
+    call disp_string
+    call new_line
+    jmp $
+
+_finish_loading_svga_mode:
+    mov ax, finish_loading_svga_mode
+    call disp_string
+    call new_line
+
+    ; Set SVGA mode
+    mov ax, 4F02H
+    mov bx, 4180H ; 1440 * 900
+    int 10H
+
+    cmp ax, 004FH
+    jz _set_svga_mode_successed
+
+    mov ax, set_svga_mode_failed
+    call disp_string
+    call new_line
+    jmp $
+
+_set_svga_mode_successed:
+    cli
+    
+    db 0x66
+    lgdt [gdt_ptr]
+
+    db 0x66
+    lidt [idt_ptr]
+
+    mov eax, cr0
+    or eax, 1
+    mov cr0, eax
+
+    jmp dword code32_sel:pm_mode_start
+
+[SECTION .s32]
+[BITS 32]
+pm_mode_start:
+    mov ax, data32_sel
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov ss, ax
+    mov esp, 7E00H
+
     jmp $
 
 [SECTION .s16lib]
 [BITS 16]
 %include 's16lib.inc'
+%include 'display16.inc'
 
 current_kernel_offset dd KERNEL_OFFSET
 
-start_loader_message db "Start loader..."
+start_loader_message db "Start loader...", 0
 unread_root_dir_sectors dw ROOT_DIR_SECTORS
 root_dir_sector_offset  dw ROOT_DIR_SECTOR_INDEX
 kernel_name             db 'KERNEL  BIN', 0
-kernel_not_found_prompt db 'FatalError: Kernel cannot be found!'
-kernel_found_prompt     db 'Kernel has been found '
-finish_loading_kernel_prompt db 'Finish loading kernel :)'
+kernel_not_found_prompt db 'FatalError: Kernel cannot be found!', 0
+kernel_found_prompt     db 'Kernel has been found ', 0
+finish_loading_kernel_prompt db 'Finish loading kernel :)', 0
 
-memory_info_prompt db '====== Memory Info ======'
-load_mem_info_failed_message db 'Load memory info failed.'
-load_mem_info_successed_message db 'Load memory info successed.'
+memory_info_prompt db '====== Memory Info ======', 0
+load_mem_info_failed_message db 'Load memory info failed.', 0
+load_mem_info_successed_message db 'Load memory info successed.', 0
+
+vbe_info_prompt db '====== VBE Info ======', 0
+get_svga_vbe_info_failed db 'Get SVGA VBE info failed.', 0
+get_svga_vbe_info_successed db 'Get SVGA VBE info successed.', 0
+
+svga_mode_prompt db '====== SVGA mode ======', 0
+load_svga_mode_failed db 'Get SVGA mode failed.', 0
+finish_loading_svga_mode db 'Finish loading SVGA mode.', 0
+set_svga_mode_failed db 'Set SVGA mode failed.', 0
+
+; ========= Tmp IDE =========
+; Because interrupts are disabled during setting up process,
+; these dummy IDT entries are enough.
+idt:
+    times 0x50 dq 0
+idt_end:
+
+idt_ptr:
+    dw idt_end - idt - 1
+    dd idt
