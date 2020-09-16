@@ -362,7 +362,7 @@ _finish_loading_svga_mode:
     call disp_string
     call new_line
 
-    ; Set SVGA mode
+    ;Set SVGA mode
     mov ax, 4F02H
     mov bx, 4180H ; 1440 * 900
     int 10H
