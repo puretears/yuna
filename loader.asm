@@ -21,6 +21,18 @@ gdt_ptr dw gdt_len - 1
 code32_sel equ code32_desc - label_gdt
 data32_sel equ data32_desc - label_gdt
 
+[SECTION gdt64]
+label_gdt64: dd 0, 0
+code64_desc: dd 0x00000000, 0x00209A00
+data64_desc: dd 0x00000000, 0x00009200
+
+gdt64_len equ $ - label_gdt64
+gdt64_ptr dw gdt64_len - 1
+          dd label_gdt64
+
+code64_sel equ code64_desc - label_gdt64
+data64_sel equ data64_desc - label_gdt64
+
 [SECTION .s16]
 [BITS 16]
 
@@ -400,7 +412,77 @@ pm_mode_start:
     mov ss, ax
     mov esp, 7E00H
 
+    call intel64_available
+    test eax, eax
+    jnz _intel64_available
+
+    ; We cannot display anything after changing the display mode.
+    ; Just hang up the system
     jmp $
+
+_intel64_available:
+    ; -------------- Temporary Page Table --------------
+    mov dword [0x90000], 0x91007  ; PML4
+
+    mov dword [0x91000], 0x92007  ; PDPT
+
+    mov dword [0x92000], 0x000083 ; PD
+    mov dword [0x92008], 0x200083
+    mov dword [0x92010], 0x400083
+    mov dword [0x92018], 0x600083
+    mov dword [0x92020], 0x800083
+    mov dword [0x92028], 0xa00083
+    ; ------------- End Temporary Page Table ------------
+
+    ; db 0x66
+    lgdt [gdt64_ptr]
+
+    mov ax, data64_sel
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+    mov ss, ax
+    mov esp, 7E00H
+
+    ; Open PAE
+    mov eax, cr4
+    bts eax, 5
+    mov cr4, eax
+
+    ; Load CR3
+    mov eax, 90000H
+    mov cr3, eax
+
+    ; Enable long mode
+    mov ecx, 0C0000080H
+    rdmsr
+    bts eax, 8
+    wrmsr
+
+    ; Enable paging
+    mov eax, cr0
+    bts eax, 0
+    bts eax, 31
+    mov cr0, eax
+
+    jmp code64_sel:KERNEL_OFFSET
+
+    ; Return
+    ; eax: 1 - available; 0 - unavailable;
+intel64_available:
+    mov eax, 0x80000000
+    cpuid
+    cmp eax, 0x80000001
+    setnb al
+    jb _long_mode_done
+    mov eax, 0x80000001
+    cpuid
+    bt edx, 29
+    setc al
+_long_mode_done:
+    movzx eax, al
+    ret
 
 [SECTION .s16lib]
 [BITS 16]
