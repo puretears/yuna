@@ -6,7 +6,7 @@
 
 为了完成接下来的内容，你至少需要准备好以下文档：
 
-* [在这里下载](https://software.intel.com/content/www/us/en/develop/download/intel-64-and-ia-32-architectures-sdm-combined-volumes-1-2a-2b-2c-2d-3a-3b-3c-3d-and-4.html) Intel 提供的关于 Intel 64 和 IA-32 处理器的开发文档。当我们要在内核中实现切换到保护模式、开启内存分页、切换到 64 位模式、中断管理，多任务、APIC 等一系列功能时，这份文档里描述了 Intel 处理器对这些特性的硬件支持细节。
+* [在这里下载](https://software.intel.com/content/www/us/en/develop/download/intel-64-and-ia-32-architectures-sdm-combined-volumes-1-2a-2b-2c-2d-3a-3b-3c-3d-and-4.html) Intel 提供的关于 Intel 64 和 IA-32 处理器的开发文档。当我们要在内核中实现切换到保护模式、切换到 64 位模式、开启内存分页、中断管理，多任务、APIC 等一系列功能时，这份文档里描述了 Intel 处理器对这些特性的硬件支持细节。
 
 安装好以下工具：
 
@@ -18,7 +18,7 @@
 
 * [nasm](https://www.nasm.us/)：这是我们使用的汇编工具，相比 Linux 使用的 AT&T 语法，nasm 支持更为简洁的 Intel 汇编语法格式，它也更接近我们在大学时学过的汇编语言。在 mac OS 上直接使用 `brew install nasm` 安装就好了，在 Linux 上，则使用对应发行版的包管理工具安装即可。
 
-* 最后，就是选择一个你自己喜欢的编辑器，我们会用到的代码，主要就是 C 和汇编，以及一点点的 C++，所以任何一个现如今的主流开发者编辑器都可以胜任。这里，我选择了 [Visual Studio Code](https://code.visualstudio.com/)，并安装了 [nasm 插件](https://marketplace.visualstudio.com/items?itemName=rights.nas-vscode)。这样，就可以愉快地编写汇编代码了。
+* 最后，就是选择一个你自己喜欢的编辑器，我们会用到的代码，主要就是 C 和汇编，以及一点点的 C++，所以任何一个现如今的主流开发者编辑器都可以胜任。
 
 ## Hello, Kernel World
 
@@ -42,7 +42,7 @@ dw 0xAA55
 * `times 510 - ($ - $$) db 0` 中，`$` 和 `$$` 可以理解成两个指针，`$` 表示当前语句的地址，`$$` 表示代码段的首地址（其实我们也只有唯一的一个代码段）。于是，`510 - ($ - $$)` 就表示除去已经编写的代码，在 510 字节中，还空出来多少字节，我们用 `times` 命令，把这些字节填充 0。之所以要填充 0，是因为我们要确保编译出来的二进制文件大小必须是 512 字节。稍后，我们会直接把它镜像到磁盘的第一个扇区上；
 * `dw 0xAA55`，这是引导扇区的结束标记，必须用 `0xAA55` 结尾；
 
-至此，这个内核版 Hello, World 程序的结构就说清楚了。也就是说，我们的代码，最多只能写 510 字节而已。
+至此，这个内核版 Hello, World 程序的结构就说清楚了。也就是说，我们的代码，最多只能写 510 字节而已。接下来，我们来实现向屏幕打印字符的功能。
 
 首先，我们把 CPU 的常用段寄存器设置成 `0x7C00`，这样做是为了接下来，使用 BIOS 中断 API 的时候，确保内存的读写都是正确的：
 
@@ -57,7 +57,7 @@ label_start:
     mov sp, BASE
 ```
 
-其次，用 BIOS 中断 API 清屏。在使用 `int 10H` 之前，每一个寄存器设置值的含义，我都写在了注释里。在初始的实模式下，默认的显示器分辨率是 80 x 25。因此，我们把 `CH / CL` 的初始位置设置成 0，`DH / DL` 的结束位置设置成 25 和 80，就可以把整个屏幕清空了。当然，你也可以不关注这些细节，把下面的代码理解成反正把 `AX / BX / CX / DX` 设置成这些值之后，再用 `int 10H`，就能清屏了也可以，反正我们也不会反复去写这样的代码：
+其次，用 BIOS 中断 API 清屏。在使用 `int 10H` 之前，每一个寄存器设置值的含义，我都写在了注释里。在初始的实模式下，默认的显示器分辨率是 80 x 25。因此，我们把 `CH / CL` 表达的初始位置设置成 0，`DH / DL` 表达的结束位置设置成 25 和 80，就可以把整个屏幕清空了。当然，你也可以不关注这些细节，把下面的代码理解成反正把 `AX / BX / CX / DX` 设置成这些值之后，再用 `int 10H`，就能清屏了也可以，反正我们也不会反复去写这样的代码：
 
 ```asm
 ; Clear screen
@@ -118,7 +118,7 @@ jmp $
 最后，是 `booting_message` 的定义：
 
 ```asm
-booting_message     db 'Hello, Kernel World!'
+booting_message      db 'Hello, Kernel World!'
 times 510 - ($ - $$) db 0
 dw 0xAA55
 ```

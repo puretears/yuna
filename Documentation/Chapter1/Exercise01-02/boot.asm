@@ -1,4 +1,5 @@
     org 0x7C00
+BASE equ 07C00H
 
 label_start:
     mov ax, cs
