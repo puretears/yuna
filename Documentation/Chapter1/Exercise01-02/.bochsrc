@@ -1,0 +1,54 @@
+plugin_ctrl: unmapped=1, biosdev=1, speaker=1, extfpuirq=1, parallel=1, serial=1, iodebug=1
+config_interface: textconfig
+
+display_library: sdl2
+
+cpu: model=corei7_haswell_4770, count=1, ips=50000000, reset_on_triple_fault=1, ignore_bad_msrs=1, msrs="msrs.def"
+cpu: cpuid_limit_winnt=0
+cpuid: x86_64=1,level=6, mmx=1, sep=1, simd=avx512, aes=1, movbe=1, xsave=1,apic=x2apic,sha=1,movbe=1,adx=1,xsaveopt=1,avx_f16c=1,avx_fma=1,bmi=bmi2,1 g_pages=1,pcid=1,fsgsbase=1,smep=1,smap=1,mwait=1,vmx=1 
+cpuid: family=6, model=0x1a, stepping=5, vendor_string="GenuineIntel", brand_string="Intel(R) Core(TM) i7-4770 CPU (Haswell)"
+
+memory: guest=512, host=1024
+
+romimage: file=$BXSHARE/BIOS-bochs-latest, options=fastboot
+
+vgaromimage: file=$BXSHARE/VGABIOS-lgpl-latest
+
+keyboard: type=mf, serial_delay=250, paste_delay=100000, user_shortcut=none
+mouse: enabled=0
+
+pci: enabled=1, chipset=i440fx
+
+private_colormap: enabled=0
+
+floppya: 1_44=Output/boot.img, status=inserted, write_protected=0
+boot: floppy
+floppy_bootsig_check: disabled=0
+
+ata0: enabled=1, ioaddr1=0x1f0, ioaddr2=0x3f0, irq=14
+ata1: enabled=1, ioaddr1=0x170, ioaddr2=0x370, irq=15
+ata2: enabled=0, ioaddr1=0x1e8, ioaddr2=0x3e0, irq=11
+ata3: enabled=0, ioaddr1=0x168, ioaddr2=0x360, irq=9
+
+ata0-master: type=none
+ata0-slave: type=none
+ata1-master: type=none
+ata1-slave: type=none
+
+
+log: Output/bochsout.txt
+panic: action=ask
+error: action=report
+info: action=report
+debug: action=ignore, pci=report # report BX_DEBUG from module 'pci'
+
+debugger_log: Output/debugger.out
+
+com1: enabled=1, mode=null
+com2: enabled=0
+com3: enabled=0
+com4: enabled=0
+
+parport1: enabled=1, file="parport.out"
+
+

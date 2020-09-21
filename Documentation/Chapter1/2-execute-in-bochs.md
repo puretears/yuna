@@ -27,7 +27,7 @@ floppya: 1_44=boot.img, status=inserted, write_protected=0
 boot: floppy
 ```
 
-这两个配置表示 Bochs 从过软盘启动，软盘镜像是当前目录下的 boot.img（别急，稍后我们就会制作这个文件）。
+这两个配置表示 Bochs 通过软盘启动，软盘镜像是当前目录下的 boot.img（别急，稍后我们就会制作这个文件）。
 
 ```ini
 log: Output/bochsout.txt
