@@ -2,7 +2,7 @@
 
 [本节源代码](https://github.com/puretears/yuna/tree/master/Documentation/Chapter1/Execise04)
 
-这一节，我们来落实之前提出的让引导扇区代码去加载另外一端程序的想法。这个实验需要两个文件：
+这一节，我们来落实之前提出的让引导扇区代码去加载另外一段程序的想法。这个实验需要两个文件：
 
 * 一个仍旧是引导扇区的代码 boot.asm；
 * 另一个则是被加载程序的代码，我们叫它叫做 loader.asm;

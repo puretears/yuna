@@ -81,7 +81,7 @@ BS_FileSystem               db 'FAT12   '
 * **BPB_ResveredSectors**：文件系统保留的扇区数。对 FAT12 来说，这个值是 1，因为引导扇区是保留的；
 * **BPB_NumOfFATTables**：文件系统中，FAT的个数，至于什么是 FAT，我们稍后再说，现在只要知道，对于 FAT12 来说，这个值总是 2，其中一个是另外一个的拷贝就好了；
 * **BPB_RootDirectoryEntries**：文件系统中，根目录项个数的最大值，所谓的根目录项，就是文件系统中用于记录文件属性信息的一个数据结构。要注意的是，这个值必须是 16 的倍数；
-* **BPB_TotalSectors**：磁盘的扇区数，这个值为什么是 2880 呢？如果一个软件的容量按 1.44MB 计算的话，这个值应该是 1.44 x 1024 x 1024 / 512，也就是 2949 才对呀。实际上，这个 Bochs 自带的 bximage 工具的一个 bug 有关。当我们用 bximage 查看它生成的 boot.img 文件时，可以看到镜像信息是类似这样的：
+* **BPB_TotalSectors**：磁盘的扇区数，这个值为什么是 2880 呢？如果一个软件的容量按 1.44MB 计算的话，这个值应该是 1.44 x 1024 x 1024 / 512，也就是 2949 才对呀。实际上，这和 Bochs 自带的 bximage 工具的一个 bug 有关。当我们用 bximage 查看它生成的 boot.img 文件时，可以看到镜像信息是类似这样的：
 
 ```shell
 # Execute bximage and enter 5
@@ -93,7 +93,7 @@ hd_size: 1474560
 geometry = 2/16/63 (1 MB)
 ```
 
-看到吧，bximage 生成的软盘镜像，大小是 1474560 字节，并不是严格的 1.44MB，因此用这个值除以 512，就是 2880 了。
+看到了吧，bximage 生成的软盘镜像，大小是 1474560 字节，并不是严格的 1.44MB，因此用这个值除以 512，就是 2880 了。
 
 * **BPB_MediaDescriptor**：表示媒体描述符，大家理解成 0F0H 表示 1.44MB 软盘就好了；
 * **BPB_SectorsPerFAT**：表示文件系统中，每个 FAT 占用的扇区数，这个值的计算方法我们稍后再说；
@@ -118,7 +118,7 @@ nasm boot.asm -o boot.bin
 dd if=boot.bin of=boot.img bs=512 count=1 conv=notrunc
 ```
 
-执行下 Bochs，如果一切顺利，新的代码仍旧可以正常在屏幕上打印 Hello, Kernel World!。但这次，我们插入 Bochs 的软盘，已经是带有文件系统的了。如何确认这个事情呢？根据你使用的操作系统，我们有几种不同的做法。
+执行下 Bochs，如果一切顺利，新的代码仍旧可以正常在屏幕上打印 Hello, Kernel World!。但这次，我们插入 Bochs 的软盘，已经是带有文件系统的了。如何确认这个事情呢？根据使用的操作系统，我们有几种不同的做法。
 
 ### 和 Linux 兼容的方法
 
