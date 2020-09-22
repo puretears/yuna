@@ -2,10 +2,10 @@
 
 BASE equ 07C00H
 LOADER_BASE             equ 0x1000
-LOADER_OFFSET           equ 0x0
+LOADER_OFFSET           equ 0x0 ; 0x10000
 FAT1_SECTOR_INDEX       equ 1
-ROOT_DIR_SECTORS        equ 14
-ROOT_DIR_SECTOR_INDEX   equ 19
+ROOT_DIR_SECTORS        equ 14 ; 224 * 32 / 512
+ROOT_DIR_SECTOR_INDEX   equ 19 ; 1 + 9 + 9
 
     jmp short label_start
     nop
