@@ -125,6 +125,7 @@ jmp $
 ```asm
 ; -------------- Temporary Page Table --------------
 mov dword [0x90000], 0x91007  ; PML4
+mov dword [0x90800], 0x91007  ; PML4
 
 mov dword [0x91000], 0x92007  ; PDPT
 

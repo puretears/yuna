@@ -146,7 +146,7 @@ _loader_found:
     mov cx, [es:di]
     push cx ; Push the cluster index
     add cx, ax
-    add cx, 17 ; 1 + 9 + 9 + CX - 2
+    add cx, 17 ; 1 + 9 + 9 + ax - 2
 
     mov ax, LOADER_BASE
     mov es, ax

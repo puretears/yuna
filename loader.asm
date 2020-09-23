@@ -423,6 +423,7 @@ pm_mode_start:
 _intel64_available:
     ; -------------- Temporary Page Table --------------
     mov dword [0x90000], 0x91003  ; PML4
+    mov dword [0x90800], 0x91003  ; PML4
 
     mov dword [0x91000], 0x92003  ; PDPT
 
