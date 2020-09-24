@@ -296,7 +296,6 @@ _load_mem_info_successed:
     mov ax, load_mem_info_successed_message
     call disp_string
     call new_line
-    int 10H
 
     ; Get SVGA info
     mov ax, vbe_info_prompt
