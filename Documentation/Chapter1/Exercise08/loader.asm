@@ -188,8 +188,6 @@ _continue_loading_kernel:
     push edi
     
     mov cx, 200H
-    mov ax, KERNEL_BASE
-    mov fs, ax
     mov edi, dword [current_kernel_offset]
 
     mov ax, TMP_KERNEL_BASE

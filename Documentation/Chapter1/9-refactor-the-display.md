@@ -17,21 +17,21 @@ mov bp, finish_loading_kernel_prompt
 int 10H
 ```
 
-* 另一方面，当我们为内核切换到保护模式之后，BIOS 中断也就不再可用了，我们需要使用其它方式在屏幕上显示内容，这里先做一些必要的铺垫；
+* 另一方面，当我们为内核切换到保护模式之后，BIOS 中断也就不再可用了，我们需要使用其它方式在屏幕上显示内容，这里有必要先做一些必要的铺垫；
 
 ## 从 VESA 和 VBE 说起
 
-说起和计算机现实有关的内容，必须要提到的就是 VESA (Video Electroic Standards Association)。这是一个致力于推广计算机显示标准的非盈利组织。VBE (Video BIOS Extension) 就是这个组织制定的显示规范标准。当然，全面了解这个标准的每一个细节，仍旧是非常复杂的事情，需要我们具备不少专业的图形知识。如果大家感兴趣，可以在 [VBE wiki](https://en.wikipedia.org/wiki/VESA_BIOS_Extensions) 上阅读这个扩展的详细技术规范。当下，我们只要知道，这个标准可以极大简化我们对显示设备的编程接口就好了。
+说起和计算机显示有关的内容，必须要提到的就是 VESA (Video Electroic Standards Association)。这是一个致力于推广计算机显示标准的非盈利组织。VBE (Video BIOS Extension) 就是这个组织制定的显示规范标准。当然，全面了解这个标准的每一个细节，仍旧是非常复杂的事情，需要我们具备不少专业的图形知识。如果大家感兴趣，可以在 [VBE wiki](https://en.wikipedia.org/wiki/VESA_BIOS_Extensions) 上阅读这个扩展的详细技术规范。当下，我们只要知道，这个标准已经可以极大简化我们对显示设备的编程接口就好了。
 
 ## 最简单的 Frame Buffer
 
 接下来要说的一个概念，是 frame buffer，你可能并不了解它的确切含义，但你或多或少也应该听说过它。究竟什么是 frame buffer 呢？简单来说，它就是屏幕显示内容的内存映像。屏幕上的每一个像素，就对应 frame buffer 中的一个存储单元。简单来说，就是只要我们在 frame buffer 的内存区域中写进去数据，屏幕上就会有对应内容的显示了。
 
-当 Bochs 启动的时候，显示器工作在**字符显示模式**。此时的屏幕分辨率是 80 x 60，也就是 80 行，60 列。这个行列的每个坐标，可以显示一个字符。而我们刚才说的 frame buffer 的首地址，是 0xB8000。
+当 Bochs 启动的时候，显示器工作在**字符显示模式**。此时的屏幕分辨率是 80 x 25，也就是 80 行，25 列。这个行列的每个坐标，可以显示一个字符。而我们刚才说的 frame buffer 的首地址，是 0xB8000。
 
 > 严格来说，这个文本模式的 frame buffer 的首地址有两个，分别是黑白屏幕的 0xB0000 和彩色屏幕的 0xB8000。只不过现如今已经很少有黑白屏幕，我们忽略这种情况就好了。
 
-在这个 frame buffer 里，每个存储单元都是两字节，把它们用图形表达出来，就是这样的：
+在这个最原始的 frame buffer 里，每个存储单元都是两字节，把它们用图形表达出来，就是这样的：
 
 ```shell
   15──────◇──────◇──────◇──────┬───────◇──────◇─────◇───────8
@@ -45,7 +45,7 @@ int 10H
 其中：
 
 * 低字节是要显示字符的 ASCII 码；
-* 高字节是显示属性。它的低 4 bit 表示前景色，高 4-bit 表示背景色。`R / G / B` 分表表示 Red, Green 和 Blue。`HL` 表示高亮显示，`BL` 表示背景闪烁；
+* 高字节是显示属性。它的低 4 bit 表示前景色，高 4-bit 表示背景色。`R / G / B` 分表表示 Red, Green 和 Blue，置位则显色。`HL` 表示高亮显示，`BL` 表示背景闪烁；
 
 也就是说，只要我们从 0xB8000 开始，按照存储单元的规格，每写两个字节，屏幕上就会多出来一个特定显示效果的字符。
 
@@ -87,7 +87,7 @@ mov al, 'A'
 call disp_ascii
 ```
 
-由于使用了寄存器传参，这里也不存在平衡栈的问题，很方便。了解了它的用法之后，我们来看实现。
+由于使用了寄存器传参，这里也不存在调用前后平衡栈的问题，很方便。了解了它的用法之后，我们来看实现。
 
 首先，是保存和恢复寄存器状态：
 
@@ -102,7 +102,7 @@ pop gs
 ret
 ```
 
-在我们的接口函数里，**除了 `ax` 寄存器之外，确保其它寄存器在函数调用前后都不会发生变化**。这是我们编写函数时遵循的一个准则，这里说一次，在其他函数里，就不再重复了。
+在我们的接口函数里，**除了 `ax` 寄存器之外，确保其它寄存器在函数调用前后都不会发生变化**。display16.inc 中的所有函数都遵循这个准则。
 
 其次，让 `gs` 寄存器指向 frame buffer 的起始地址：
 
@@ -157,12 +157,55 @@ _disp_string_end:
 
 ### disp_al
 
-另外一个
+另外一个显示函数是 `disp_al`，它打印 `al` 寄存器的值：
 
+```asm
+; al - The digit to be displayed
+disp_al:
+    push gs
+    push edi
+    push ecx
+    push edx
+
+    mov cx, 0B800H
+    mov gs, cx
+
+    mov edi, [global_disp_position]
+    mov ah, 0FH
+    mov dl, al
+    shr al, 4
+    mov cx, 2
+
+_begin:
+    and al, 0FH
+    cmp al, 9
+    ja _1
+    add al, '0' ; convert number to ascii
+    jmp _2
+_1:
+    sub al, 0AH
+    add al, 'A'
+_2:
+    mov [gs:edi], ax
+    add edi, 2
+
+    mov al, dl
+    loop _begin
+
+    mov [global_disp_position], edi
+
+    pop edx
+    pop ecx
+    pop edi
+    pop gs
+    ret
+```
+
+和 `disp_ascii` 不同的是，`al` 的值不是直接要显示的 ASCII。因此，我们要对 `al` 的高 4 位和低 4 位先进行转换之后再显示。因此，如果要显示的值小于等于 9，我们就把它加上 `0` 的 ASCII 之后直接显示；否则，这就是十六进制中 `A-F` 的部分，我们就要算一下它和 `0xA` 的差值，用这个差加上字符 `A`，然后再显示。
 
 ### clear_screen
 
-接下来，是用于清屏的函数 `clear_screen`，它的思路很简单，就是把 80 x 26 中的每一个位置都写上空格就好了。另外，别忘了“清屏”之后，重置 `global_disp_position` 的位置，这样，就可以从屏幕左上角重新写入了：
+接下来，是用于清屏的函数 `clear_screen`，它的思路很简单，就是把 80 x 25 中的每一个位置都写上空格就好了。另外，别忘了“清屏”之后，重置 `global_disp_position` 的位置，这样，就可以从屏幕左上角重新写入了：
 
 ```asm
 ; Clean up the screen
@@ -181,7 +224,7 @@ _clear:
 
 ### new_line
 
-接下来，是用于换行的函数 `new_line`，它实际上与显示无关，我们只要根据 `global_disp_position` 的值，算出下一行的起始位置就好了，这个计算方法，就是 `global_disp_position / 16` 的商加 1，再乘以 160：
+接下来，是用于换行的函数 `new_line`，它实际上与显示无关，我们只要根据 `global_disp_position` 的值，算出下一行的起始位置就好了，这个计算方法，就是 `global_disp_position / 160` 的商加 1，再乘以 160：
 
 ```asm
 new_line:
@@ -205,7 +248,7 @@ new_line:
 
 ## Refactor loader.asm
 
-有了上面这些 API 之后，我们就可以重构下 loader.asm 了：
+有了上面这些 API 之后，我们还要修改下 loader.asm 了：
 
 * 一个是把之前所有使用 `int 10H` 显示字符的部分，都换成 `disp_string` 函数；
 * 另一个，是之前所有要显示的字符串末尾，都要添加一字节 0；
