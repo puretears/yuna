@@ -4,18 +4,17 @@
 
 ## 切换到保护模式
 
-希望你还记得，之前为了进入 Real Big Mode，我们让 loader.bin 在保护模式逛了一圈。现在还是使用同样的 GDT，我们装载 `gdtr` 寄存器：
+希望你还记得，之前为了进入 Real Big Mode，我们让 loader.bin 在保护模式逛了一圈。现在，还是使用同样的 GDT，我们装载 `gdtr` 寄存器：
 
 ```asm
 cli
-    
 db 0x66
 lgdt [gdt_ptr]
 ```
 
 > 注意，接下来的 CPU 设置都必须在关中断的条件下完成。因此，我们使用了 `cli` 指令。
 
-实际上，在保护模式里，不仅内存的管理方式有所变化，中断的执行方式也和实模式不同。简单来说，中断执行的代码，是通过一个叫做 interrupt descriptor 的结构描述的，这些 descriptor 组合起来的结构，叫做 interrupt descriptor table，也就是 IDT。这个表的概念，和我们之前使用的 GDT 是类似的。至于 IDT 的细节，等我们为内核实现中断处理程序的时候再说，大家知道有这么回事儿就好。在 loader.bin 里，我们先设置一个全 0 的替身作为 IDT 就好了，毕竟接下来我们都处于中断关闭的状态，也不会用到 IDT。
+实际上，在保护模式里，不仅内存的管理方式有所变化，中断的执行方式也和实模式不同。简单来说，中断执行的代码，是通过一个叫做 interrupt descriptor 的结构描述的，这些 descriptor 组合起来的结构，叫做 interrupt descriptor table，也就是 IDT。这个表的概念，和我们之前使用的 GDT 是类似的。至于 IDT 的细节，等我们为内核实现中断处理程序的时候再说，大家知道有这么回事儿就好。在 loader 里，我们先设置一个全 0 的替身作为 IDT 就好了，毕竟接下来我们都处于中断关闭的状态，也不会用到 IDT。
 
 为此，在 loader.asm 里，我们添加了下面的代码：
 
@@ -193,7 +192,7 @@ mov eax, 90000H
 mov cr3, eax
 ```
 
-再通过设置 MSR 寄存器把 64 IA-32e 模式的寻址方式设置成 4 级页表。这里 `rdmsr / wrmst` 是 Intel CPU 读写 MSR 寄存器的专用指令。当使用 `rdmsr` 读取 MSR 寄存器时，要通过 `ecx` 指定 MSR 寄存器的地址。至于 `0C0000080H` 这个值的含义，稍后我们和分页模式一起说明：
+再通过设置 MSR 寄存器把 IA-32e 模式的寻址方式设置成 4 级页表。这里 `rdmsr / wrmst` 是 Intel CPU 读写 MSR 寄存器的专用指令。当使用 `rdmsr` 读取 MSR 寄存器时，要通过 `ecx` 指定 MSR 寄存器的地址。至于 `0C0000080H` 这个值的含义，稍后我们和分页模式一起说明：
 
 ```asm
 ; Enable long mode
