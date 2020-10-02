@@ -1,7 +1,7 @@
 #!/bin/bash
 
 mount Output/boot.img /media -t vfat -o loop
-cp Output/loader.bin /media
-cp Output/kernel.bin /media
+cp -f Source/Boot/Output/loader.bin /media
+cp -f Source/Kernel/Output/kernel.bin /media
 sync
 umount /media

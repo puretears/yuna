@@ -1,22 +1,24 @@
 #!/bin/bash
-IMAGE=Output/boot.img
+ROOT=$(pwd)
+IMAGE=$ROOT/Output/boot.img
 
 if [ ! -f "$IMAGE" ]; then
     echo "Creating $IMAGE"
-    bximage -mode=create -fd=1.44M -q Output/boot.img
+    bximage -mode=create -fd=1.44M -q $IMAGE
 fi
 
-echo "Compiling boot.asm ..."
-nasm boot.asm -o Output/boot.bin
+echo "========== Building Boot Loader =========="
+cd ./Source/Boot
+make
+cd ../../
 
-echo "Compiling loader.asm ..."
-nasm loader.asm -o Output/loader.bin
+echo "========== Building The Kernel =========="
+cd ./Source/Kernel
+make
+cd ../../
 
-echo "Compiling kernel.asm ..."
-nasm kernel.asm -o Output/kernel.bin
+echo "========== Dumping Boot Sector =========="
+dd if=$ROOT/Source/Boot/Output/boot.bin of=$IMAGE bs=512 count=1 conv=notrunc
 
-echo "Dumping boot sector ..."
-dd if=Output/boot.bin of=$IMAGE bs=512 count=1 conv=notrunc
-
-echo "Installing loader ..."
-docker run -it -w /home/root -v $HOME/Projects/Yuna:/home/root --privileged boxue/base:1.1.0 ./cp.sh
+echo "========== Installing Loader and Kernel =========="
+docker run -v $ROOT:/home/root -w /home/root --privileged boxue/base:1.1.0 ./cp.sh
