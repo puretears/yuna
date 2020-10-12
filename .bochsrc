@@ -44,6 +44,7 @@ debug: action=ignore, pci=report # report BX_DEBUG from module 'pci'
 
 debugger_log: Output/debugger.out
 
+
 com1: enabled=1, mode=null
 com2: enabled=0
 com3: enabled=0
