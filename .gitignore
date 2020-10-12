@@ -6,3 +6,5 @@ debugger.out
 .DS_Store
 *.monopic
 *.sketch
+Screenshots/
+Output/*
