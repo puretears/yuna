@@ -7,6 +7,18 @@ if [ ! -f "$IMAGE" ]; then
     bximage -mode=create -fd=1.44M -q $IMAGE
 fi
 
+if [ ! -d "$ROOT/Output" ]
+    midir -p $ROOT/Output
+fi 
+
+if [ ! -d "$ROOT/Source/Boot/Output" ]
+    midir -p $ROOT/Source/Boot/Output
+fi
+
+if [ ! -d "$ROOT/Source/Kernel/Output" ]
+    midir -p $ROOT/Source/Kernel/Output
+fi
+
 echo "========== Building Boot Loader =========="
 cd ./Source/Boot
 make
