@@ -13,6 +13,7 @@ int _parse_flags(const char **);
 int _parse_width(const char **);
 int _parse_precision(const char **);
 int _parse_sub_specifier(const char **);
+char *_number(char *str, long num, int base, int width, int precision, int type);
 
 void putchar(unsigned int *fb, 
   int scn_width, 
@@ -114,10 +115,10 @@ int vsprintf(char *buf, const char *fmt, va_list args) {
         break;
       case 'o': // Unsigned octal
         if (sub_specifier == 'l') {
-          str = number(str, va_arg(args, unsigned long), 8, width, precision, flags);
+          str = _number(str, va_arg(args, unsigned long), 8, width, precision, flags);
         }
         else {
-          str = number(str, va_arg(args, unsigned int), 8, width, precision, flags);
+          str = _number(str, va_arg(args, unsigned int), 8, width, precision, flags);
         }
 
         break;
@@ -126,34 +127,34 @@ int vsprintf(char *buf, const char *fmt, va_list args) {
           width = 2 * sizeof(void *);
         }
 
-        str = number(str, (unsigned long)va_arg(args, void *), 16, width, precision, flags);
+        str = _number(str, (unsigned long)va_arg(args, void *), 16, width, precision, flags);
         break;
       case 'x':
         flags |= LOWERCASE;
       case 'X': // Hexidecimal
         if (sub_specifier == 'l') {
-          str = number(str, va_arg(args, unsigned long), 16, width, precision, flags);
+          str = _number(str, va_arg(args, unsigned long), 16, width, precision, flags);
         }
         else {
-          str = number(str, va_arg(args, unsigned int), 16, width, precision, flags);
+          str = _number(str, va_arg(args, unsigned int), 16, width, precision, flags);
         }
         break;
       case 'd':
       case 'i': // Signed decimal integer
         flags |= SIGN;
         if (sub_specifier == 'l') {
-          str = number(str, va_arg(args, long), 10, width, precision, flags);
+          str = _number(str, va_arg(args, long), 10, width, precision, flags);
         }
         else {
-          str = number(str, va_arg(args, int), 10, width, precision, flags);
+          str = _number(str, va_arg(args, int), 10, width, precision, flags);
         }
         break;
       case 'u': // Unsigned decimal integer
         if (sub_specifier == 'l') {
-          str = number(str, va_arg(args, unsigned long), 10, width, precision, flags);
+          str = _number(str, va_arg(args, unsigned long), 10, width, precision, flags);
         }
         else {
-          str = number(str, va_arg(args, unsigned int), 10, width, precision, flags);
+          str = _number(str, va_arg(args, unsigned int), 10, width, precision, flags);
         }
         break;
       case '%':
@@ -342,7 +343,7 @@ int _parse_sub_specifier(const char **fmt) {
  *  - LOWERCASE
  *  - LEFT
  */
-char *number(char *str, long num, int base, int width, int precision, int type) {
+char *_number(char *str, long num, int base, int width, int precision, int type) {
   if (base < 2 || base > 36) { return 0; }
 
   const char *digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";

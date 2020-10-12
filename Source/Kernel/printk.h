@@ -37,8 +37,6 @@ struct Position {
   reminder; \
 })
 
-char *number(char *str, long num, int base, int width, int precision, int type);
-
 void putchar(unsigned int *fb, 
   int scn_width, 
   int x, int y, 

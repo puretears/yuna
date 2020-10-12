@@ -7,15 +7,15 @@ if [ ! -f "$IMAGE" ]; then
     bximage -mode=create -fd=1.44M -q $IMAGE
 fi
 
-if [ ! -d "$ROOT/Output" ]
+if [ ! -d "$ROOT/Output" ]; then
     midir -p $ROOT/Output
 fi 
 
-if [ ! -d "$ROOT/Source/Boot/Output" ]
+if [ ! -d "$ROOT/Source/Boot/Output" ]; then
     midir -p $ROOT/Source/Boot/Output
 fi
 
-if [ ! -d "$ROOT/Source/Kernel/Output" ]
+if [ ! -d "$ROOT/Source/Kernel/Output" ]; then
     midir -p $ROOT/Source/Kernel/Output
 fi
 
