@@ -21,30 +21,37 @@ OBJS=Output/head.o Output/printk.o Output/main.o
 everything: $(YUNABOOT) $(YUNAKERNEL) $(YUNASYSTEM)
 
 clean:
-	- rm -f $(OBJS) $(YUNAKERNEL) $(YUNAKERNEL) $(YUNASYSTEM) Output/_head.s
+	- rm -f $(OBJS) $(YUNABOOT) $(YUNAKERNEL) $(YUNASYSTEM) Output/_head.s
 
 image:
 	dd if=Output/boot.bin of=Output/boot.img bs=512 count=1 conv=notrunc
 	$(CP)
 
 Output/boot.bin: Source/Boot/boot.asm Source/Boot/fat12.inc Source/Boot/s16lib.inc
+	$(info ========== Building Boot.bin ==========)
 	$(ASM) -ISource/Boot -o $@ $<
 
 Output/loader.bin: Source/Boot/loader.asm Source/Boot/fat12.inc Source/Boot/s16lib.inc Source/Boot/display16.inc
+	$(info ========== Building Loader.bin ==========)
 	$(ASM) -ISource/Boot -o $@ $<
 
 $(YUNAKERNEL): $(YUNASYSTEM)
+	$(info ========== Remove extra sections of the kernel ==========)
 	$(OBJCOPY) -S -R ".eh_frame" -R ".comment" -O binary $< $@
 
 $(YUNASYSTEM): $(OBJS)
+	$(info ========== Linking the kernel ==========)
 	$(LD) -b elf64-x86-64 -z muldefs -o $@ $(OBJS) -T Source/Kernel/kernel.lds
 
 Output/main.o: Source/Kernel/main.c Source/Kernel/lib.h Source/Kernel/printk.h Source/Kernel/font.h
+	$(info ========== Compiling main.c ==========)
 	$(CC) -mcmodel=large -fno-builtin -ggdb -m64 -c $< -o $@
 
 Output/printk.o: Source/Kernel/printk.c Source/Kernel/lib.h Source/Kernel/printk.h Source/Kernel/font.h
+	$(info ========== Compiling printk.c ==========)
 	$(CC) -mcmodel=large -fno-builtin -ggdb -m64 -fgnu89-inline -fno-stack-protector -c $< -o $@
 
 Output/head.o: Source/Kernel/head.S
+	$(info ========== Building kernel head ==========)
 	$(CC) -E $< > Output/_head.s
 	$(AS) --64 -o $@ Output/_head.s

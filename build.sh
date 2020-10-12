@@ -11,26 +11,4 @@ if [ ! -d "$ROOT/Output" ]; then
     midir -p $ROOT/Output
 fi 
 
-if [ ! -d "$ROOT/Source/Boot/Output" ]; then
-    midir -p $ROOT/Source/Boot/Output
-fi
-
-if [ ! -d "$ROOT/Source/Kernel/Output" ]; then
-    midir -p $ROOT/Source/Kernel/Output
-fi
-
-echo "========== Building Boot Loader =========="
-cd ./Source/Boot
-make
-cd ../../
-
-echo "========== Building The Kernel =========="
-cd ./Source/Kernel
-make
-cd ../../
-
-echo "========== Dumping Boot Sector =========="
-dd if=$ROOT/Source/Boot/Output/boot.bin of=$IMAGE bs=512 count=1 conv=notrunc
-
-echo "========== Installing Loader and Kernel =========="
-docker run -v $ROOT:/home/root -w /home/root --privileged boxue/base:1.1.0 ./cp.sh
+make clean everything
