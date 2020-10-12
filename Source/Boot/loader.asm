@@ -217,23 +217,12 @@ _move_kernel:
     push ax
     add ax, ROOT_DIR_SECTORS
     add ax, 17
-    ; add bx, [BPB_BytesPerSector]
     jmp _continue_loading_kernel
 
 _finish_loading_kernel:
     mov ax, finish_loading_kernel_prompt
     call disp_string
     call new_line
-    ; mov ax, 1301H
-    ; mov bx, 000FH
-    ; mov dx, 0300H
-    ; mov cx, 24
-    ; push ax
-    ; mov ax, ds
-    ; mov es, ax
-    ; pop ax
-    ; mov bp, finish_loading_kernel_prompt
-    ; int 10H
 
     ; Kill motor
     push dx
@@ -350,14 +339,14 @@ _finish_loading_svga_mode:
     call disp_string
     call new_line
 
-    ;Set SVGA mode
-    ;mov ax, 4F02H
-    ;mov bx, 4180H ; 1440 * 900
-    ;int 10H
+    ; Set SVGA mode
+    mov ax, 4F02H
+    mov bx, 4180H ; 1440 * 900
+    int 10H
 
-    ;cmp ax, 004FH
-    ;jz _set_svga_mode_successed
-    jmp _set_svga_mode_successed
+    cmp ax, 004FH
+    jz _set_svga_mode_successed
+    ; jmp _set_svga_mode_successed
 
     mov ax, set_svga_mode_failed
     call disp_string
