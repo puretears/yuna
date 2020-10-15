@@ -10,7 +10,7 @@ _start:
     mov %ax, %ss
     mov $0x7E00, %esp
 
-    lgdt GDT_POINTER(%rip)
+    lgdt gdt_ptr(%rip)
     lidt idt_ptr(%rip)
 
     mov $0x10, %ax
@@ -23,14 +23,12 @@ _start:
     movq $0x101000, %rax
     movq %rax, %cr3
 
-    movq _kernel_64bit_code(%rip), %rax
+    movq _entry64(%rip), %rax
     pushq $0x08
     pushq %rax
     lretq // Simulate jmp 0x08:_kernel_64bit_code
 
     // kernel 64-bit code
-_kernel_64bit_code:
-    .quad _entry64
 _entry64:
     mov $0x10, %ax
     mov %ax, %ds
@@ -82,22 +80,22 @@ _PDE:
 .align 8
 
 .section .data
-.global GDT
-GDT:
+.global gdt
+gdt:
     .quad 0x0000000000000000
     .quad 0x0020980000000000
     .quad 0x0000920000000000
-GDT_END:
+gdt_end:
 
-GDT_POINTER:
-    .word GDT_END - GDT - 1
-    .quad GDT
+gdt_ptr:
+    .word gdt_end - gdt - 1
+    .quad gdt
 
-.global idt_start
-idt_start:
+.global idt
+idt:
     .fill 512, 8, 0
 idt_end:
 
 idt_ptr:
-    .word idt_end - idt_start - 1
-    .quad idt_start
+    .word idt_end - idt - 1
+    .quad idt

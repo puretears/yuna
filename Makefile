@@ -7,13 +7,13 @@ CXX=docker run -v $(ROOT):/home/root -w /home/root boxue/base:1.1.0 g++
 CC=docker run -v $(ROOT):/home/root -w /home/root boxue/base:1.1.0 gcc
 AS=docker run -v $(ROOT):/home/root -w /home/root boxue/base:1.1.0 as
 LD=docker run -v $(ROOT):/home/root -w /home/root boxue/base:1.1.0 ld
-CP=docker run -v $(ROOT):/home/root -w /home/root boxue/base:1.1.0 ./cp.sh
-OBJCOPY=docker run -v $(ROOT):/home/root -w /home/root --privileged boxue/base:1.1.0 objcopy
+CP=docker run -v $(ROOT):/home/root -w /home/root --privileged boxue/base:1.1.0 ./cp.sh
+OBJCOPY=docker run -v $(ROOT):/home/root -w /home/root boxue/base:1.1.0 objcopy
 
+# Objects
 YUNABOOT=Output/boot.bin Output/loader.bin
 YUNAKERNEL=Output/kernel.bin
 YUNASYSTEM=Output/system
-
 OBJS=Output/head.o Output/printk.o Output/main.o
 
 .PHONY: everything clean image
@@ -41,7 +41,7 @@ $(YUNAKERNEL): $(YUNASYSTEM)
 
 $(YUNASYSTEM): $(OBJS)
 	$(info ========== Linking the kernel ==========)
-	$(LD) -b elf64-x86-64 -z muldefs -o $@ $(OBJS) -T Source/Kernel/kernel.lds
+	$(LD) -z muldefs -o $@ $(OBJS) -T Source/Kernel/kernel.lds
 
 Output/main.o: Source/Kernel/main.c Source/Kernel/lib.h Source/Kernel/printk.h Source/Kernel/font.h
 	$(info ========== Compiling main.c ==========)

@@ -345,8 +345,8 @@ _finish_loading_svga_mode:
     int 10H
 
     cmp ax, 004FH
-    jz _set_svga_mode_successed
-    ; jmp _set_svga_mode_successed
+    ; jz _set_svga_mode_successed
+    ; jmp $
 
     mov ax, set_svga_mode_failed
     call disp_string
