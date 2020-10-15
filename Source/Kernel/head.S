@@ -23,12 +23,14 @@ _start:
     movq $0x101000, %rax
     movq %rax, %cr3
 
-    movq _entry64(%rip), %rax
+    movq _kernel_64bit_code(%rip), %rax
     pushq $0x08
     pushq %rax
     lretq // Simulate jmp 0x08:_kernel_64bit_code
 
     // kernel 64-bit code
+_kernel_64bit_code:
+    .quad _entry64
 _entry64:
     mov $0x10, %ax
     mov %ax, %ds

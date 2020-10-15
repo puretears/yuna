@@ -1,4 +1,4 @@
-# The kernel header - I
+# The kernel header
 
 从这一节开始，我们来构建内核的头部。就像之前说过的，它从 loader 接手硬件的控制权，正式为内核设置必要的数据结构，并把硬件的控制权转交给内核。
 
@@ -165,22 +165,25 @@ jmp code64_sel:KERNEL_OFFSET ; Invalid in 64 bit mode
 `as` 不支持在 64 位模式里使用。为了在 64 位模式中实现跳转，我们得借助另外一种“移动”到代码其它位置的方法，也就是 `ret` 指令。什么意思呢？简单来说，当我们调用一个函数的时候，CPU 会把函数返回的位置先压栈，等到函数返回执行 `ret` 指令的时候，会从栈中找到要返回的位置。于是，我们只要手工在栈里构建一个所谓的“返回地址”，然后执行 `ret` 指令，就能变向实现跳转了。这段代码写出来，是这样的：
 
 ```asm
-    movq _entry64(%rip), %rax
+    movq _kernel_64bit_code(%rip), %rax
     pushq $0x08
     pushq %rax
-    lretq // Simulate jmp 0x08:_entry64
+    lretq // Simulate jmp 0x08:_kernel_64bit_code
 
     // kernel 64-bit code
+_kernel_64bit_code:
+    .quad _entry64
 _entry64:
     mov $0x10, %ax
     mov %ax, %ds
     mov %ax, %es
     mov %ax, %fs
     mov %ax, %ss
-    movq $0xFFFF800000007E00, %rsp
 ```
 
 `_entry64` 的位置，是要“跳转”的目标地址，在这里我们刷新了所有数据段寄存器。接下来，我们先用 RIP relative 的方式把这个地址保存在 `rax` 寄存器里，再把代码段的 selector 和 offset 压栈，这样就人为构建了一个返回地址。当我们执行 `lretq` 指令时，就返回到我们期望的地址执行了。
+
+> 关于在栈中构建返回地址的这种做法，我们还要额外说一句。`rip` 中是 CPU 要执行的**下一条指令的地址**。因此入栈的是 `_kernel_64bit_code` 的地址，这个地址的值才是 `_entry64`。
 
 ## 跳转到 C 的入口函数
 
