@@ -60,7 +60,7 @@ umount /media
 ROOT:=$(shell pwd)
 ```
 
-这里，我们了 `$(shell)` 函数，获取了 `pwd` 命令的结果。我们假定执行 `make` 命令的时候，用户所处的目录就是项目的根目录，因此变量 `ROOT` 就是项目根目录的完整路径。在 Makefile 中，要使用 Shell 中某个命令的结果时，就可以这样。当然，make 还提供了很多函数供开发者使用，大家知道这种语法就好，等我们用到的时候，随用随说。
+这里，我们用 `$(shell)` 函数，获取了 `pwd` 命令的结果。我们假定执行 `make` 命令的时候，用户所处的目录就是项目的根目录，因此变量 `ROOT` 就是项目根目录的完整路径。在 Makefile 中，要使用 Shell 中某个命令的结果时，就可以这样。当然，make 还提供了很多函数供开发者使用，大家知道这种语法就好，等我们用到的时候，随用随说。
 
 其次，是表达项目工具链的一组变量：
 
@@ -112,7 +112,7 @@ OBJS=Output/head.o Output/printk.o Output/main.o
 * 清理项目目录；
 * 安装 loader 和内核；
 
-为此，我们使用 `.PHONY` 给 Makefile 定义三个虚拟目标：
+为此，我们使用 `.PHONY` 给 Makefile 定义了三个虚拟目标：
 
 ```shell
 .PHONY: everything clean image
