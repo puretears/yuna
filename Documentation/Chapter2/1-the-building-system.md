@@ -192,7 +192,7 @@ image:
   $(CP)
 ```
 
-## What's next?
+## What's next
 
 至此，这个 Makefile 就算是初步完成了。大家可以[参考完整的源代码](https://github.com/puretears/yuna/blob/master/Makefile)再来理解下 Makefile 中我们提到的每一部分内容。借助这个文件，我们就有了三种管理项目的功能：
 

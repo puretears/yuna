@@ -19,6 +19,7 @@ struct Position {
   unsigned long fb_length;
 } pos;
 
+#define RED 0x00FF0000
 #define WHITE 0x00FFFFFF
 #define BLACK 0x00000000
 #define YELLOW 0x00FFFF00

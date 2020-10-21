@@ -82,22 +82,40 @@ _PDE:
 .align 8
 
 .section .data
+// GDT
 .global gdt
 gdt:
-    .quad 0x0000000000000000
-    .quad 0x0020980000000000
-    .quad 0x0000920000000000
+    .quad 0x0000000000000000 /* 0 - NULL descriptor */
+    .quad 0x0020980000000000 /* 1 - Kernel 64-bit code segment */
+    .quad 0x0000920000000000 /* 2 - Kernel 64-bit data segment */
+    .quad 0x0020F80000000000 /* 3 - User 64-bit code segment */
+    .quad 0x0000F20000000000 /* 4 - User 64-bit data segment */
+    .quad 0x0000000000000000 /* 5 - Reserved for future use */
+    .quad 0x0000000000000000 /* 6 - Reserved for future use */
+    .quad 0x0000000000000000 /* 7 - Reserved for future use */
+    .fill 10, 8, 0           /* 8,9 - TSS64 */
 gdt_end:
 
 gdt_ptr:
     .word gdt_end - gdt - 1
     .quad gdt
 
+// IDT
 .global idt
 idt:
-    .fill 512, 8, 0
+    .fill 512, 8, 0 // 256 x 64
 idt_end:
 
 idt_ptr:
     .word idt_end - idt - 1
     .quad idt
+
+// TSS
+.global tss
+tss:
+    .fill 13, 8, 0
+tss_end:
+
+tss_ptr:
+    .word tss_end - tss - 1
+    .quad tss

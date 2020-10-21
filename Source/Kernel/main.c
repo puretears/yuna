@@ -1,4 +1,6 @@
 #include "lib.h"
+#include "trap.h"
+#include "gate.h"
 #include "printk.h"
 
 void Start_Kernel() {
@@ -51,6 +53,14 @@ void Start_Kernel() {
 
 	int i = -10;
 	printk(YELLOW, BLACK, "Address d: %8.6d. %%", i);
+
+	tss_init();
+	load_tr(8);
 	
+	vector_init();
+
+	int j = 1;
+	--j;
+	int b = 3 / j;
   while(1);
 }
