@@ -69,7 +69,7 @@ _PDE:
     .quad 0x400083
     .quad 0x600083
     .quad 0x800083
-    .quad 0xe0000083 // Frame buffer
+    .quad 0xe0000083 // Frame buffer FFFF800000A00000
     .quad 0xe0200083
     .quad 0xe0400083
     .quad 0xe0600083

@@ -16,9 +16,9 @@ YUNAKERNEL=Output/kernel.bin
 YUNASYSTEM=Output/system
 OBJS=Output/head.o Output/entry.o Output/gate.o Output/trap.o Output/printk.o Output/main.o
 
-.PHONY: everything clean image
+.PHONY: all clean image
 
-everything: $(YUNABOOT) $(YUNAKERNEL) $(YUNASYSTEM)
+all: $(YUNABOOT) $(YUNAKERNEL) $(YUNASYSTEM)
 
 clean:
 	- rm -f $(OBJS) $(YUNABOOT) $(YUNAKERNEL) $(YUNASYSTEM) Output/_head.s
