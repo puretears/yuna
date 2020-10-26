@@ -178,7 +178,6 @@ int vsprintf(char *buf, const char *fmt, va_list args) {
 int printk(unsigned int fg_color, unsigned int bg_color, const char *fmt, ...) {
   int buffer_length = 0;
   int counter = 0;
-  int line = 0;
   va_list args;
   va_start(args, fmt);
   buffer_length = vsprintf(string_buffer, fmt, args);
