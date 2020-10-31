@@ -16,31 +16,15 @@ void pixel_fill32(unsigned int *fb, unsigned int rgb, int x0, int y0, int x1, in
 }
 
 void Start_Kernel() {
-  unsigned int *fb = (unsigned int *)0xFFFF800000A00000;
-  pixel_fill32(fb, 0x00FF0000, 0, 0, 1440, 100);
+  pos.scn_width = 1440;
+  pos.scn_height = 900;
+  pos.char_x = 0;
+  pos.char_y = 0;
+  pos.char_width = 8;
+  pos.char_height = 16;
+  pos.fb_addr = (unsigned int *)0xFFFF800000A00000;
+  pos.fb_length = pos.scn_width * pos.scn_height * 4;
 
-  putchar(fb, 1440, 720, 450, 0x0000FFFF, 0x00000000, 'Y');
-  // pos.scn_width = 1440;
-  // pos.scn_height = 900;
-  // pos.char_x = 0;
-  // pos.char_y = 0;
-  // pos.char_width = 8;
-  // pos.char_height = 16;
-  // pos.fb_addr = (unsigned int *)0xFFFF800000A00000;
-  // pos.fb_length = pos.scn_width * pos.scn_height * 4;
-
-  // // printk(YELLOW, BLACK, "The octal of 16 is: %o\n", 16);
-
-  // int i = -10;
-  // printk(YELLOW, BLACK, "Address d: %8.6d. %%", i);
-
-  // tss_init();
-  // load_tr(8);
-
-  // vector_init();
-
-  // int j = 1;
-  // --j;
-  // int b = 3 / j;
-  while(1);
+  int number = 16;
+  printk(YELLOW, BLACK, "The hex of %d is: %#x\n", number, number);
 }

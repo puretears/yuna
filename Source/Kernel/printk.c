@@ -329,7 +329,7 @@ int _parse_precision(const char **fmt) {
 int _parse_sub_specifier(const char **fmt) {
   int specifier = -1;
   // TODO: we omit other specifiers for simplicity
-  if (**fmt == 'l') { 
+  if (**fmt == 'l') {
     specifier = **fmt;
     ++(*fmt);
   }
@@ -375,7 +375,8 @@ char *_number(char *str, long num, int base, int width, int precision, int type)
   if (num == 0) { tmp[i++] = '0'; }
   else {
     while (num != 0) {
-      tmp[i++] = digits[div(num, base)];
+      tmp[i++] = digits[num % base];
+      num = num / base;
     }
   }
 
@@ -404,7 +405,7 @@ char *_number(char *str, long num, int base, int width, int precision, int type)
     }
   }
 
-  while (i < precision--) { 
+  while (i < precision--) {
     *str++ = '0';
   }
 
@@ -412,7 +413,7 @@ char *_number(char *str, long num, int base, int width, int precision, int type)
     *str++ = tmp[i];
   }
 
-  while (width-- > 0) { 
+  while (width-- > 0) {
     *str++ = ' ';
   }
 

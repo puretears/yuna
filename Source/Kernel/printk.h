@@ -44,4 +44,6 @@ void putchar(unsigned int *fb,
   int fg_color, int bg_color, unsigned char c);
 
 int printk(unsigned int fg_color, unsigned int bg_color, const char *fmt, ...);
+
+char *_number(char *str, long num, int base, int width, int precision, int type);
 #endif
