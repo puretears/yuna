@@ -16,6 +16,10 @@ void pixel_fill32(unsigned int *fb, unsigned int rgb, int x0, int y0, int x1, in
 }
 
 void Start_Kernel() {
+  // pixel_fill32(fb, 0x00FF0000, 0, 0, 1440, 100);
+  // putchar(fb, 1440, 720, 450, 0x0000FFFF, 0x00000000, 'Y');
+  // char * str = _number(string_buffer, 1025, 16, 64, 32, SPECIAL);
+  
   pos.scn_width = 1440;
   pos.scn_height = 900;
   pos.char_x = 0;
@@ -25,6 +29,18 @@ void Start_Kernel() {
   pos.fb_addr = (unsigned int *)0xFFFF800000A00000;
   pos.fb_length = pos.scn_width * pos.scn_height * 4;
 
-  int number = 16;
-  printk(YELLOW, BLACK, "The hex of %d is: %#x\n", number, number);
+  printk(WHITE, BLACK, "[Info] %2.2d: %s", 1, "Hello, world.");
+
+  tss_init();
+  load_tr(8);
+
+  vector_init();
+
+  // Divide 0 error
+  // int j = 1;
+  // --j;
+  // int b = 3 / j;
+
+  __asm__ __volatile__ ("int3 \n\t");
+  while(1);
 }

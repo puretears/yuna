@@ -11,4 +11,4 @@ if [ ! -d "$ROOT/Output" ]; then
     midir -p $ROOT/Output
 fi 
 
-make clean everything
+make clean all

@@ -78,7 +78,7 @@ void Start_Kernel() {
 }
 ```
 
-`0xFFFF800000A00000` 是 frame buffer 的起始地址在内核中的线性地址，这个在为内核设置页表的时候我们说过了。这样，我们就从屏幕左上角位置，花了一条高度是 100 像素的红色色带。执行 `make && make image` 之后，在 bochs 里执行，应该就可以看到这样的结果了：
+`0xFFFF800000A00000` 是 frame buffer 的起始地址在内核中的线性地址，这个在为内核设置页表的时候我们说过了。这样，我们就从屏幕左上角位置，画了一条高度是 100 像素的红色色带。执行 `make && make image` 之后，在 bochs 里执行，应该就可以看到这样的结果了：
 
 ![kernel-display-1](Images/kernel-display-1@2x.jpg)
 

@@ -1,28 +1,5 @@
 #include "gate.h"
 
-// inline void set_gate(unsigned long *selector, unsigned short attr, unsigned char ist, void *handler) {
-//   unsigned long low, high;
-
-//   asm volatile(
-//     "movw %%dx, %%ax \n\t"
-//     "andq $0x7, %%rcx \n\t"
-//     "addq %4, %%rcx \n\t"
-//     "shlq $32, %%rcx \n\t" // rcx - IST
-//     "addq %%rcx, %%rax \n\t" // rax - IST + Selector
-//     "xorq %%rcx, %%rcx \n\t"
-//     "movl %%edx, %%ecx \n\t" // rcx - low 32-bit of handler address
-//     "shrq $16, %%rcx \n\t"
-//     "shlq $48, %%rcx \n\t" // rcx - offset 16...31 of handler hadress
-//     "addq %%rcx, %%rax \n\t" // rax - IST + Selector + Offset 16...31
-//     "movq %%rax, %0 \n\t"
-//     "shrq $32, %%rdx \n\t"
-//     "movq %%rdx, %1 \n\t"
-//     :"=m"(*selector), "=m"(*(selector + 1)), "=&a"(low), "=&d"(high)
-//     :"i"(attr << 8), "3"((unsigned long *)handler), "2"(0x8<<16), "c"(ist)
-//     :"memory"
-//   );
-// }
-
 volatile void set_gate64(gate_descriptor *desc, unsigned char attr, unsigned char ist, void *handler) {
   unsigned long high = 0;
   unsigned long low = 0;
@@ -71,19 +48,19 @@ volatile void load_tr(unsigned char sel) {
   );
 }
 
-inline void set_intr_gate64(unsigned int n, unsigned char ist, void *handler) {
+void set_intr_gate64(unsigned int n, unsigned char ist, void *handler) {
   set_gate64(idt + n, 0x8E, ist, handler);
 }
 
-inline void set_trap_gate64(unsigned int n, unsigned char ist, void *handler) {
+void set_trap_gate64(unsigned int n, unsigned char ist, void *handler) {
   set_gate64(idt + n, 0x8F, ist, handler);
 }
 
-inline void set_user_intr_gate64(unsigned int n, unsigned char ist, void *handler) {
+void set_user_intr_gate64(unsigned int n, unsigned char ist, void *handler) {
   set_gate64(idt + n, 0xEE, ist, handler);
 }
 
-inline void set_user_trap_gate64(unsigned int n, unsigned char ist, void *handler) {
+void set_user_trap_gate64(unsigned int n, unsigned char ist, void *handler) {
   set_gate64(idt + n, 0xEF, ist, handler);
 }
 

@@ -1,8 +1,10 @@
 # The print family iii
 
-这一节，我们来完成格式化字符串的函数 `vsprintf`。
+这一节，我们来实现格式化字符串的函数 `vsprintf`。
 
 ## _number
+
+由于这个函数比较复杂，在开始实现它的逻辑之前，我们要先做一些准备。首先，是处理各种数字显示逻辑的 `_number`。
 
 ### _number 的声明
 
@@ -20,7 +22,7 @@ char *_number(char *str, long num, int base, int width, int precision, int type)
 * `width` 表示格式化后字符串的宽度，如果结果小于这个宽度，会在左边补充空格；
 * `precision` 对于整数来说，这个值表示格式化后整个数字的宽度，如果结果小于这个值，会在左边补 0；
 
-> 例如，对于整数 1011，如果 `width` 是 8，`precision` 是 6，生成的字符串就是 `  001011`。
+> 例如，对于二进制数字 1011 来说，如果 `width` 是 8，`precision` 是 6，生成的字符串就是 `  001011`。
 
 * `type` 表示附加在格式化结果上的选项，这些选项定义在 printk.h 里。对于 `_number` 来说，用到的有下面几个：
 
@@ -95,6 +97,8 @@ char *_number(char *str, long num, int base, int width, int precision, int type)
 
 处理完选项，我们就要对 `num` 进行数制转换了。计算的方法很简单，我们只要用 `num % base` 的值作为索引，在 `digits` 中取出对应的 ASCII 字符保存到 `tmp` 指向的临时缓冲区就好了：
 
+> 这里有一个额外的注意事项，由于 `num` 是带符号的，在计算数组索引，以及计算下一个 `num` 值的时候，要把它转换成无符号长整形，否则计算出的结果是不正确的。
+
 ```c
 char *_number(char *str, long num, int base, int width, int precision, int type) {
   // ...
@@ -105,7 +109,8 @@ char *_number(char *str, long num, int base, int width, int precision, int type)
   if (num == 0) { tmp[i++] = '0'; }
   else {
     while (num != 0) {
-      tmp[i++] = digits[num % base];
+      tmp[i++] = digits[(unsigned long)num % base];
+      num = (unsigned long)num / base;
     }
   }
 }

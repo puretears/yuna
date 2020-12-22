@@ -178,13 +178,15 @@ int vsprintf(char *buf, const char *fmt, va_list args) {
 int printk(unsigned int fg_color, unsigned int bg_color, const char *fmt, ...) {
   int buffer_length = 0;
   int counter = 0;
+  int line = 0;
+
   va_list args;
   va_start(args, fmt);
   buffer_length = vsprintf(string_buffer, fmt, args);
   va_end(args);
 
   for (; counter < buffer_length; ++counter) {
-    unsigned char c = (unsigned char)*(string_buffer + counter);
+    unsigned char c = string_buffer[counter];
 
     switch (c) {
       case '\n':
@@ -375,8 +377,8 @@ char *_number(char *str, long num, int base, int width, int precision, int type)
   if (num == 0) { tmp[i++] = '0'; }
   else {
     while (num != 0) {
-      tmp[i++] = digits[num % base];
-      num = num / base;
+      tmp[i++] = digits[(unsigned long)num % base];
+      num = (unsigned long)num / base;
     }
   }
 

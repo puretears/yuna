@@ -4,7 +4,7 @@
 
 ## vsprintf 的格式规范
 
-在实现之前，先来看下 C 中 `vsprintf` 的格式规范：
+在动手之前，先来看下 C 中 `vsprintf` 的格式规范：
 
 ```c
 // %[flags][width][.precision][length]specifier
@@ -18,7 +18,7 @@
 
 ## 实现格式规范的辅助函数
 
-为了处理标识符中的每一部分，在 printk.c 里，我们定义了 5 个辅助函数，我们一个个来看下。
+为了处理标识符中的每一部分，在 printk.c 里，我们定义了 5 个辅助函数。
 
 ### _parse_flags
 

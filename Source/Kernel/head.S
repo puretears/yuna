@@ -115,7 +115,3 @@ idt_ptr:
 tss:
     .fill 13, 8, 0
 tss_end:
-
-tss_ptr:
-    .word tss_end - tss - 1
-    .quad tss
