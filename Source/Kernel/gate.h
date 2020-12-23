@@ -23,11 +23,11 @@ void set_trap_gate64(unsigned int n, unsigned char ist, void *handler);
 void set_user_trap_gate64(unsigned int n, unsigned char ist, void *handler);
 
 volatile void load_tr(unsigned char sel);
-volatile void set_tss64(
+void set_tss64(
   unsigned long rsp0, unsigned long rsp1, unsigned long rsp2,
   unsigned long ist1, unsigned long ist2, unsigned long ist3,
   unsigned long ist4, unsigned long ist5, unsigned long ist6,
   unsigned long ist7);
-volatile void set_tss64_desc(descriptor *desc);
+void set_tss64_desc(descriptor *desc);
  
 #endif

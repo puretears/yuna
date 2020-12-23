@@ -20,7 +20,7 @@ volatile void set_gate64(gate_descriptor *desc, unsigned char attr, unsigned cha
   desc->high = high;
 }
 
-volatile void set_tss64_desc(descriptor *desc) {
+void set_tss64_desc(descriptor *desc) {
   unsigned long high = 0;
   unsigned long low = 0;
 
@@ -64,7 +64,7 @@ void set_user_trap_gate64(unsigned int n, unsigned char ist, void *handler) {
   set_gate64(idt + n, 0xEF, ist, handler);
 }
 
-inline void set_tss64(
+void set_tss64(
   unsigned long rsp0, unsigned long rsp1, unsigned long rsp2,
   unsigned long ist1, unsigned long ist2, unsigned long ist3,
   unsigned long ist4, unsigned long ist5, unsigned long ist6,
