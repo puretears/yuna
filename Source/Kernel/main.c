@@ -41,6 +41,8 @@ void Start_Kernel() {
   // --j;
   // int b = 3 / j;
 
-  __asm__ __volatile__ ("int3 \n\t");
+  // __asm__ __volatile__ ("int3 \n\t");
+  int i = *(int *)0xFFFFF80000AA00000;
+  
   while(1);
 }
