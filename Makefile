@@ -14,7 +14,7 @@ OBJCOPY=docker run -v $(ROOT):/home/root -w /home/root boxue/base:1.1.0 objcopy
 YUNABOOT=Output/boot.bin Output/loader.bin
 YUNAKERNEL=Output/kernel.bin
 YUNASYSTEM=Output/system
-OBJS=Output/head.o Output/entry.o Output/gate.o Output/trap.o Output/printk.o Output/main.o
+OBJS=Output/head.o Output/entry.o Output/gate.o Output/trap.o Output/memory.o Output/printk.o Output/main.o
 
 .PHONY: all clean image
 
@@ -47,6 +47,11 @@ Output/main.o: Source/Kernel/main.c Source/Kernel/lib.h Source/Kernel/trap.h \
   Source/Kernel/gate.h Source/Kernel/printk.h Source/Kernel/font.h
 	$(info ========== Compiling main.c ==========)
 	$(CC) -mcmodel=large -fno-builtin -ggdb -m64 -c $< -o $@
+
+Output/memory.o: Source/Kernel/memory.c Source/Kernel/printk.h \
+  Source/Kernel/font.h Source/Kernel/memory.h
+	$(info ========== Compiling memory.c ==========)
+	$(CC) -mcmodel=large -fno-builtin -ggdb -m64 -fgnu89-inline -fno-stack-protector -c $< -o $@
 
 Output/printk.o: Source/Kernel/printk.c Source/Kernel/lib.h Source/Kernel/printk.h Source/Kernel/font.h
 	$(info ========== Compiling printk.c ==========)

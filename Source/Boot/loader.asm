@@ -5,7 +5,8 @@ KERNEL_BASE equ 0x0
 KERNEL_OFFSET equ 0x100000
 TMP_KERNEL_BASE equ 0x0
 TMP_KERNEL_OFFSET equ 0x7E00
-MEMORY_INFO_BUFFER equ 0x7E00
+MEMORY_INFO_COUNT equ 0x7E00
+MEMORY_INFO_BUFFER equ 0x7E40
 
 %include "fat12.inc"
 
@@ -240,6 +241,7 @@ _finish_loading_kernel:
     mov ax, 0
     mov es, ax
     mov di, MEMORY_INFO_BUFFER
+    mov dword es:[MEMORY_INFO_COUNT], 0
 
 _load_mem_info:
     mov eax, 0E820H
@@ -247,6 +249,7 @@ _load_mem_info:
     mov edx, 534D4150H
     int 15H
     jc _load_mem_info_failed
+    inc dword es:[MEMORY_INFO_COUNT]
     add di, 20
     cmp ebx, 0
     jne _load_mem_info

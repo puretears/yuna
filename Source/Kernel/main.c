@@ -1,7 +1,10 @@
 #include "lib.h"
 #include "trap.h"
 #include "gate.h"
+#include "memory.h"
 #include "printk.h"
+
+struct memory_descriptor global_memory_descriptor = {{0}, 0};
 
 void pixel_fill32(unsigned int *fb, unsigned int rgb, int x0, int y0, int x1, int y1) {
   int x = 0, y = 0;
@@ -35,14 +38,14 @@ void Start_Kernel() {
   load_tr(8);
 
   vector_init();
-
+  memory_init();
   // Divide 0 error
   // int j = 1;
   // --j;
   // int b = 3 / j;
 
   // __asm__ __volatile__ ("int3 \n\t");
-  int i = *(int *)0xFFFFF80000AA00000;
+  // int i = *(int *)0xFFFFF80000AA00000;
   
   while(1);
 }
