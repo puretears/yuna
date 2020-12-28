@@ -44,7 +44,8 @@ $(YUNASYSTEM): $(OBJS)
 	$(LD) -z muldefs -o $@ $(OBJS) -T Source/Kernel/kernel.lds
 
 Output/main.o: Source/Kernel/main.c Source/Kernel/lib.h Source/Kernel/trap.h \
-  Source/Kernel/gate.h Source/Kernel/printk.h Source/Kernel/font.h
+  Source/Kernel/gate.h Source/Kernel/task.h Source/Kernel/memory.h \
+  Source/Kernel/printk.h Source/Kernel/font.h
 	$(info ========== Compiling main.c ==========)
 	$(CC) -mcmodel=large -fno-builtin -ggdb -m64 -c $< -o $@
 

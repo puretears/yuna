@@ -1,6 +1,7 @@
 #include "lib.h"
 #include "trap.h"
 #include "gate.h"
+#include "task.h"
 #include "memory.h"
 #include "printk.h"
 
@@ -32,7 +33,19 @@ void Start_Kernel() {
   pos.fb_addr = (unsigned int *)0xFFFF800000A00000;
   pos.fb_length = pos.scn_width * pos.scn_height * 4;
 
-  printk(WHITE, BLACK, "[Info] %2.2d: %s", 1, "Hello, world.");
+  printk(WHITE, BLACK, "[Info] %2.2d: %s", 1, "Hello, world.\n");
+
+  global_memory_descriptor.code_start = (unsigned long)(&_text);
+  global_memory_descriptor.code_end = (unsigned long)(&_etext);
+  global_memory_descriptor.data_start = (unsigned long)(&_data);
+  global_memory_descriptor.data_end = (unsigned long)(&_edata);
+  global_memory_descriptor.brk_end = (unsigned long)(&_end);
+
+  printk(WHITE, BLACK, "Code begins:\t%#018lx\n", global_memory_descriptor.code_start);
+  printk(WHITE, BLACK, "Code ends:\t%#018lx\n", global_memory_descriptor.code_end);
+  printk(WHITE, BLACK, "Data begins:\t%#018lx\n", global_memory_descriptor.data_start);
+  printk(WHITE, BLACK, "Data ends:\t%#018lx\n", global_memory_descriptor.data_end);
+  printk(WHITE, BLACK, "Kernel ends:\t%#018lx\n", global_memory_descriptor.brk_end);
 
   tss_init();
   load_tr(8);
