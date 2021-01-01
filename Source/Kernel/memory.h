@@ -10,6 +10,18 @@
 #define PAGE_2M_MASK (~(PAGE_2M_SIZE - 1))
 #define PAGE_2M_ALIGN(addr) (((unsigned long)(addr) + PAGE_2M_SIZE - 1) & PAGE_2M_MASK)
 
+#define VirtToPhy(addr) ((unsigned long)addr - PAGE_OFFSET)
+#define PhyToVirt(addr) ((unsigned long *)((unsigned long)addr + PAGE_OFFSET))
+
+/// Page Attribute
+#define PG_Mapped       (1 << 0)
+#define PG_Kernel_Init  (1 << 1)
+#define PG_Referenced   (1 << 2)
+
+#define PG_Active       (1 << 4)
+#define PG_Kernel       (1 << 7)
+#define PG_K_Share_To_U (1 << 8)
+
 struct e820_entry {
   unsigned long addr;
   unsigned long size;
@@ -26,23 +38,35 @@ struct memory_descriptor {
   struct e820_entry e820_table[E820_MAX_ENTRIES];
   unsigned long e820_entries;
 
+  // A bit map that keeps track of each physical memory page.
+  // One bit per page.
+  // 1 - busy page; 0 - free page;
   unsigned long *bit_map;
-  unsigned long bit_size;
-  unsigned long bit_length;
+  // How many pages are maintained by the bit map
+  unsigned long bit_count;
+  // The bytes of the bit map (long aligned)
+  unsigned long bit_count_length;
 
   struct page *pages;
-  unsigned long page_entries;
-  unsigned long page_length;
+  // How many physical memory pages that are represented by the page
+  // struct, one page struct for one physical memory page.
+  unsigned long page_struct_count;
+  // The bytes of the page struct area (long aligned)
+  unsigned long total_page_struct_length;
 
   struct zone *zones;
-  unsigned long zone_entries;
-  unsigned long zone_length;
+  // How many zones is the memory divided into
+  unsigned long zone_struct_count;
+  // The bytes of the zone struct area (long aligned)
+  unsigned long total_zone_struct_length;
 
   unsigned long code_start;
   unsigned long code_end;
   unsigned long data_start;
   unsigned long data_end;
   unsigned long brk_end;
+
+  unsigned long struct_end;
 };
 
 struct page {
@@ -58,7 +82,7 @@ struct zone {
   unsigned long page_count;
   unsigned long busy_page_count;
   unsigned long free_page_count;
-  unsigned long total_ref_count;
+  unsigned long total_page_ref_count;
 
   unsigned long start_addr;
   unsigned long end_addr;
@@ -68,7 +92,7 @@ struct zone {
   struct memory_descriptor *gmd;
 };
 
-extern struct memory_descriptor global_memory_descriptor;
+extern struct memory_descriptor gmd; // global memory descriptor
 
 void memory_init();
 #endif
