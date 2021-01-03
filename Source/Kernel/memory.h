@@ -16,11 +16,18 @@
 /// Page Attribute
 #define PG_Mapped       (1 << 0)
 #define PG_Kernel_Init  (1 << 1)
-#define PG_Referenced   (1 << 2)
 
 #define PG_Active       (1 << 4)
 #define PG_Kernel       (1 << 7)
-#define PG_K_Share_To_U (1 << 8)
+
+/// Zone Type
+#define ZONE_DMA (1 << 0)
+#define ZONE_NORMAL (1 << 1)
+#define ZONE_UNMAPED (1 << 2)
+
+int ZONE_DMA_INDEX	= 0;
+int ZONE_NORMAL_INDEX	= 0;	// [0-1)GB was mapped in pagetable
+int ZONE_UNMAPED_INDEX	= 0;	// [1, +] was unmapped
 
 struct e820_entry {
   unsigned long addr;
@@ -84,8 +91,8 @@ struct zone {
   unsigned long free_page_count;
   unsigned long total_page_ref_count;
 
-  unsigned long start_addr;
-  unsigned long end_addr;
+  unsigned long phy_start_addr;
+  unsigned long phy_end_addr;
   unsigned long length;
   unsigned long attr;
 
@@ -95,4 +102,29 @@ struct zone {
 extern struct memory_descriptor gmd; // global memory descriptor
 
 void memory_init();
+struct page *alloc_pages(int zone_type, int number, unsigned long flags);
+
+inline unsigned long get_cr3() {
+  unsigned long cr3;
+  __asm__ __volatile__(
+    "movq %%cr3, %0\n\t"
+    :"=r"(cr3)
+    :
+    :"memory"
+  );
+
+  return cr3;
+}
+
+inline void flush_tlb() {
+  unsigned long reg;
+
+  __asm__ __volatile__(
+    "movq %%cr3, %0 \n\t"
+    "movq %0, %%cr3 \n\t"
+    :"=r"(reg)
+    :
+    :"memory"
+  );
+}
 #endif
