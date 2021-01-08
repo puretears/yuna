@@ -61,8 +61,8 @@ PIC8259A::PIC8259A() {
   io::out8(0xA1, 0x01);
 
   // 8259A-M/S OCW1
-  io::out8(0x21,0x00);
-  io::out8(0xa1,0x00);
+  io::out8(0x21,0xfd);
+  io::out8(0xa1,0xff);
 
   sti();
 
@@ -116,8 +116,9 @@ template<int NR> inline void PIC8259A::build_irq() {
 }
 
 void PIC8259A::do_irq(pt_regs *regs, unsigned long nr) {
-  unsigned char x;
-  printk(PURPLE, BLACK, "do_irq: %#2.2x", nr);
+  unsigned char code = io::in8(0x60);
+  printk(PURPLE, BLACK, "do_irq: %#2.2x\tkey code:%#8.8x\n", nr, code);
+
 
   io::out8(0x20, 0x20); // Send EOI to reset ISR register.
 }

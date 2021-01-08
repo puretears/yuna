@@ -52,6 +52,6 @@ extern "C" void Start_Kernel() {
   // __asm__ __volatile__ ("int3 \n\t");
   // int i = *(int *)0xFFFFF80000AA00000;
 
-  PIC8259A pic;  
+  PIC8259A pic;
   while(1);
 }
