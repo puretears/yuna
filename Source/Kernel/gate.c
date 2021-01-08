@@ -39,7 +39,7 @@ void set_tss64_desc(descriptor *desc) {
   desc->high = 0;
 }
 
-volatile void load_tr(unsigned char sel) {
+void load_tr(unsigned char sel) {
   asm volatile(
     "ltr %%ax"
     :

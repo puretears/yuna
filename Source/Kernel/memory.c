@@ -330,3 +330,27 @@ void print_page_table(struct page *pp) {
       i, pp->phy_addr, pp->attr);
   }
 }
+
+inline unsigned long get_cr3() {
+  unsigned long cr3;
+  __asm__ __volatile__(
+    "movq %%cr3, %0\n\t"
+    :"=r"(cr3)
+    :
+    :"memory"
+  );
+
+  return cr3;
+}
+
+inline void flush_tlb() {
+  unsigned long reg;
+
+  __asm__ __volatile__(
+    "movq %%cr3, %0 \n\t"
+    "movq %0, %%cr3 \n\t"
+    :"=r"(reg)
+    :
+    :"memory"
+  );
+}

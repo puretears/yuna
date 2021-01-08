@@ -49,7 +49,7 @@ RESTORE_ALL:
   iretq
 
 ret_from_exception:
-ENTRY(ret_from_intr)
+ENTRY(ret_from_exception)
   jmp RESTORE_ALL
 
 ENTRY(divide_error)
@@ -249,3 +249,38 @@ ENTRY(control_protection_exception)
 
 // 22 - 31 are reserved by Intel
 // 32 - 255 are user defined
+
+////////////////////////////////////////////////////////
+// External interrupt handler
+////////////////////////////////////////////////////////
+RESTORE_ALL_FROM_INTR:
+  popq %r15
+  popq %r14
+  popq %r13
+  popq %r12
+  popq %r11
+  popq %r10
+  popq %r9
+  popq %r8
+  popq %rbx
+  popq %rcx
+  popq %rdx
+  popq %rsi
+  popq %rdi
+  popq %rbp
+  popq %rax
+  movq %rax, %ds
+  popq %rax
+  movq %rax, %es
+  popq %rax
+  // Jump FUNC and Pesudo Vector No.
+  addq $0x10, %rsp
+  // Jump call stack
+  // build_irq
+  // PIC8259A::build_irq
+  // do_irq <- rsp
+  addq $0x18, %rsp
+  iretq
+
+ENTRY(ret_from_intr)
+  jmp RESTORE_ALL_FROM_INTR

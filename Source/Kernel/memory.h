@@ -104,27 +104,7 @@ extern struct memory_descriptor gmd; // global memory descriptor
 void memory_init();
 struct page *alloc_pages(int zone_type, int number, unsigned long flags);
 
-inline unsigned long get_cr3() {
-  unsigned long cr3;
-  __asm__ __volatile__(
-    "movq %%cr3, %0\n\t"
-    :"=r"(cr3)
-    :
-    :"memory"
-  );
+unsigned long get_cr3();
+void flush_tlb();
 
-  return cr3;
-}
-
-inline void flush_tlb() {
-  unsigned long reg;
-
-  __asm__ __volatile__(
-    "movq %%cr3, %0 \n\t"
-    "movq %0, %%cr3 \n\t"
-    :"=r"(reg)
-    :
-    :"memory"
-  );
-}
 #endif
